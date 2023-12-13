@@ -1,6 +1,6 @@
 ## Удаление сеанса
 
-## ![DELETE](../img/delete.svg) / seance/{seanceId}
+## ![DELETE](../../img/delete.svg) / seance/{seanceId}
 
 **_Удаляет_** сеанс из системы.  
 **_Возвращает_** список всех сеансов
