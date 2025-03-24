@@ -107,7 +107,7 @@ function clickButton() {
             })
         })
     localStorage.setItem("tickets", JSON.stringify(tickets));
-    document.location = "./pay.html";
+    document.location = "./payment.html";
     })
 }
 
