@@ -320,6 +320,11 @@ function savePrices(currentPriceConfig) {
   params.set("priceStandart", `${priceConfigStandart.value}`);
   params.set("priceVip", `${priceConfigVip.value}`);
 
+  if (priceStandart & priceVip < 1 || priceStandart & priceVip != number) {
+    alert("Стоимость билетов не может быть отрицательной");
+    return;  
+  }
+
   fetch(`https://shfe-diplom.neto-server.ru/price/${currentPriceConfig}`, {
     method: "POST",
     body: params
