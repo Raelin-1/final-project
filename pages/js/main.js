@@ -310,7 +310,7 @@ function markNonactiveSeances() {
                 if (Number(currentMinutes) > Number(seance.textContent.trim().slice(3))) {
                     seance.classList.add("time__item_disabled");
                 } else {
-                    seance.classList.remove("time__iteme_disabled");
+                    seance.classList.remove("time__item_disabled");
                 }
             } else {
                 seance.classList.remove("time__item_disabled");

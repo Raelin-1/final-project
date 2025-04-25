@@ -3,6 +3,37 @@ const popupForms = Array.from(document.querySelectorAll(".popup__form"));
 const closeForm = Array.from(document.querySelectorAll(".popup__close"));
 const cancelBtn = Array.from(document.querySelectorAll(".popup__button_cancel"));
 const hideBlock = document.querySelectorAll(".admin__header_arrow");
+//fix
+const hallsConfigList = document.querySelector(".hall-config__list");
+const priceConfigList = document.querySelector(".price-config__list");
+const openList = document.querySelector(".open__list");
+
+// Update halls config list
+function updateHallsDropdowns(data) {
+  hallsConfigList.innerHTML = '';
+  data.result.halls.forEach(hall => {
+    hallsConfigList.insertAdjacentHTML('beforeend', `
+      <li class="hall__item hall-config__item" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</li>
+    `);
+  });
+
+  // Update price config list
+    priceConfigList.innerHTML = '';
+  data.result.halls.forEach(hall => {
+    priceConfigList.insertAdjacentHTML('beforeend', `
+      <li class="hall__item price-config__item" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</li>
+    `);
+  });
+  
+  // Update open sales list
+    openList.innerHTML = '';
+  data.result.halls.forEach(hall => {
+    openList.insertAdjacentHTML('beforeend', `
+      <li class="hall__item open__item" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</li>
+    `);
+  });
+} 
+//end fix
 
 //POPUP
 //close
@@ -34,8 +65,9 @@ hideBlock.forEach(block => {
     hallBody.classList.toggle('admin__wrapper-hide');
   })
 })
-
+//fix
 //GET DATA
+function GetData() {
 fetch("https://shfe-diplom.neto-server.ru/alldata")
   .then(response => response.json())
   .then((data) => {
@@ -44,7 +76,9 @@ fetch("https://shfe-diplom.neto-server.ru/alldata")
     moviesOperations(data);
     seancesOperations(data);
   })
-
+}
+  GetData();
+//end fix
 // LIST HALLS
 const hallsInfo = document.querySelector(".halls__info");
 const hallsList = document.querySelector(".listHall");
@@ -53,7 +87,7 @@ let hallRemoveButton;
 
 // SETTING HALL
 const hallsConfig = document.querySelector(".hall-config");
-const hallsConfigList = document.querySelector(".hall-config__list");
+
 const hallsConfigWrapper = document.querySelector(".hall-config__wrapper");
 let hallsConfigItems;
 let hallConfigArray = [];
@@ -74,7 +108,7 @@ let hallConfigSave;
 
 // SETTING PRICE
 const priceConfig = document.querySelector(".price-config");
-const priceConfigList = document.querySelector(".price-config__list");
+
 const priceConfigWrapper = document.querySelector(".price-config__wrapper");
 let priceConfigItems;
 let priceConfigForm;
@@ -86,7 +120,7 @@ let currentPriceConfig;
 
 // OPEN SALE
 const openSells = document.querySelector(".open");
-const openList = document.querySelector(".open__list");
+
 const openWrapper = document.querySelector(".open__wrapper");
 let openInfo;
 let openButton;
@@ -144,16 +178,40 @@ function addHall(inputAddHall) {
         console.log(data);
         hallsList.insertAdjacentHTML("beforeend", `
         <li class="listHall_item">
-          <span class="listHall_name" data-id="${data.result.halls.id}>${inputAddHall.value}</span> 
+          <span class="listHall_name" data-id="${data.result.halls.id}">${inputAddHall.value}</span> 
           <span class="admin__button_remove hall_remove"></span></p>
         </li>
         `);
 
         inputAddHall.value = "";
-        location.reload();
+        // fix
+        popupHallAdd.classList.add("popup__hidden");
+        GetData();
+        // end fix
       })
   }
 }
+        //const newHall = document.createElement('li');
+//         newHall.className = 'listHall_item';
+//         newHall.innerHTML = `
+//           <span class="listHall_name" data-id="${data.result.halls.id}">${inputAddHall.value}</span>
+//           <span class="admin__button_remove hall_remove"></span></p>
+//         `;
+        
+//         // Add event listener to the remove button
+//         const removeButton = newHall.querySelector('.hall_remove');
+//         removeButton.addEventListener('click', () => {
+//           deleteHall(data.result.halls.id);
+//         });
+        
+//         // Add the new hall to the list
+//         hallsList.appendChild(newHall);
+        
+//         inputAddHall.value = "";
+//         popupHallAdd.classList.add("popup__hidden");
+//       });
+//   }
+// }
 
 // DELETE HALL
 function deleteHall(hallId) {
@@ -163,9 +221,18 @@ function deleteHall(hallId) {
     .then(response => response.json())
     .then((data) => {
       console.log(data);
-      location.reload();
+      // fix
+      GetData();
+      // end fix
     })
 }
+//       console.log(data);
+//       const hallToRemove = document.querySelector(`.listHall_name[data-id="${hallId}"]`).closest('.listHall_item');
+//       if (hallToRemove) {
+//         hallToRemove.remove();
+//       }
+//     });
+// }
 
 // SHOW SCHEMA
 function showHall(data, currentHallConfigIndex) {
@@ -290,7 +357,9 @@ function saveConfig(currentHallConfig, newHallConfigArray) {
     .then((data) => {
       console.log(data);
       alert("Конфигурация зала сохранена!");
-      location.reload();
+      //fix
+      GetData();
+      //end fix
     })
 }
 
@@ -316,6 +385,13 @@ function showPrices(data, currentPriceConfig) {
 
 // SAVE SETTING PRICE
 function savePrices(currentPriceConfig) {
+  const standardPrice = Number(priceConfigStandart.value);
+  const vipPrice = Number(priceConfigVip.value);
+  
+  if (standardPrice < 0 || vipPrice < 0) {
+    alert("Цены должны быть положительными числами");
+    return; 
+  }
   const params = new FormData();
   params.set("priceStandart", `${priceConfigStandart.value}`);
   params.set("priceVip", `${priceConfigVip.value}`);
@@ -328,7 +404,9 @@ function savePrices(currentPriceConfig) {
     .then((data) => {
       console.log(data);
       alert("Конфигурация цен сохранена!");
-      location.reload();
+      //fix
+      GetData();
+      //end fix
     })
 }
 
@@ -384,8 +462,29 @@ function openCloseHall(currentOpen, hallNewStatus) {
     })
 }
 
+// fix 
+let count = 1;
+// end fix 
+
 // GET INFO HALL
 function hallsOperations(data) {
+
+  // fix
+hallsList.innerHTML="";
+hallsConfigList.innerHTML="";
+priceConfigList.innerHTML="";
+openList.innerHTML="";
+ movieSeancesTimelines.innerHTML = "";
+
+if (count >= 2){
+  hallConfigSave.replaceWith(hallConfigSave.cloneNode(true));
+  hallConfigCancel.replaceWith(hallConfigCancel.cloneNode(true));
+  priceConfigSave.replaceWith(priceConfigSave.cloneNode(true));
+  priceConfigCancel.replaceWith(priceConfigCancel.cloneNode(true));
+  openButton.replaceWith(openButton.cloneNode(true));  
+}
+count = count + 1;
+// end fix
 
   for (let i = 0; i < data.result.halls.length; i++) {
 
@@ -656,6 +755,10 @@ let posterFile;
 function addMovie(posterFile) {
   const formData = new FormData();
   let numbDuration = Number(inputMovieTime.value);
+  if (isNaN(numbDuration) || numbDuration < 1) {
+    alert("Длительность должна быть больше 0");
+    numbDuration = Math.max(1, isNaN(numbDuration) ? 1 : numbDuration);
+  } else {
 
   formData.set("filmName", `${inputMovieName.value}`);
   formData.set("filmDuration", `${numbDuration}`);
@@ -671,11 +774,15 @@ function addMovie(posterFile) {
     .then((data) => {
       console.log(data);
       alert(`Фильм ${inputMovieName.value} добавлен!`);
-      location.reload();
+      //fix
+      popupMovieAdd.classList.add("popup__hidden");
+      GetData();
+      //end fix
     })
+  }
 }
 
-// DELETE FILM
+// DELETE MOVIE
 function deleteMovie(movieId) {
   fetch(`https://shfe-diplom.neto-server.ru/film/${movieId}`, {
     method: "DELETE",
@@ -684,7 +791,9 @@ function deleteMovie(movieId) {
     .then((data) => {
       console.log(data);
       alert(`Фильм ${movieId} удален!`);
-      location.reload();
+      //fix
+      GetData();
+      //end fix
     })
 }
 
@@ -723,9 +832,19 @@ movieSeancesWrapper.addEventListener("click", (e) => {
   }
 })
 
+//fix
+let count2 = 1;
+//end fix
+
 // GET FILMS
 function moviesOperations(data) {
   let movieCount = 1;
+//fix
+  if (count2 >= 2){
+    movieSeancesWrapper.replaceWith(movieSeancesWrapper.cloneNode(true));
+   }
+   count2 = count2 + 1;
+   //end fix
 
   for (let i = 0; i < data.result.films.length; i++) {
     movieSeancesWrapper.insertAdjacentHTML("beforeend", `
@@ -1063,11 +1182,11 @@ function clickSeanseAddButton() {
       currentSeancesTimeEnd = currentSeanceTimeStart + Number(currentSeancesDuration);
 
       if (seanceTimeStart >= currentSeanceTimeStart && seanceTimeStart <= currentSeancesTimeEnd) {
-        alert("Новый сеанс пересекается по времени с существующими!");
+        //alert("Новый сеанс пересекается по времени с существующими!");
         seancesChecked.push("false");
         break;
       } else if (seanceTimeEnd >= currentSeanceTimeStart && seanceTimeEnd <= currentSeancesTimeEnd) {
-        alert("Новый сеанс пересекается по времени с существующими!");
+        //alert("Новый сеанс пересекается по времени с существующими!");
         seancesChecked.push("false");
         break;
       } else {
@@ -1229,7 +1348,9 @@ movieSeancesSave.addEventListener("click", (e) => {
     }
 
     alert("Сеансы сохранены!");
-    location.reload();
+    //fix
+    GetData();
+    //end fix
   }
 })
 
