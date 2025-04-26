@@ -176,18 +176,9 @@ function addHall(inputAddHall) {
       .then(response => response.json())
       .then((data) => {
         console.log(data);
-        hallsList.insertAdjacentHTML("beforeend", `
-        <li class="listHall_item">
-          <span class="listHall_name" data-id="${data.result.halls.id}">${inputAddHall.value}</span> 
-          <span class="admin__button_remove hall_remove"></span></p>
-        </li>
-        `);
-
         inputAddHall.value = "";
-        // fix
-        popupHallAdd.classList.add("popup__hidden");
-        GetData();
-        // end fix
+		popupHallAdd.classList.add("popup__hidden");
+		GetData();
       })
   }
 }
@@ -310,6 +301,8 @@ function changePlaces(hallSchemeRows, data) {
 
 // CHANGE SIZE OF HALL
 function changeHallSize(newHallConfigArray, data) {
+	console.log(newHallConfigArray);
+	console.log(data);
   hallConfigForm.addEventListener("input", () => {
     newHallConfigArray.splice(0, newHallConfigArray.length);
 
@@ -343,24 +336,39 @@ function changeHallSize(newHallConfigArray, data) {
 
 // SAVE SETTING HALL
 function saveConfig(currentHallConfig, newHallConfigArray) {
-  const params = new FormData();
+  const targetRows = parseInt(hallConfigRows.value);
+  const targetPlaces = parseInt(hallConfigPlaces.value);
 
-  params.set("rowCount", `${hallConfigRows.value}`);
-  params.set("placeCount", `${hallConfigPlaces.value}`);
-  params.set("config", JSON.stringify(newHallConfigArray));
+  const finalConfig = Array.from({ length: targetRows }, (_, rowIndex) => 
+    Array.from({ length: targetPlaces }, (_, placeIndex) => {
+      if (rowIndex < newHallConfigArray.length && 
+          placeIndex < newHallConfigArray[0]?.length) {
+        const seat = newHallConfigArray[rowIndex][placeIndex];
+        return ["standart", "vip", "disabled"].includes(seat) ? seat : "standart";
+      }
+      return "standart";
+    })
+  );
+
+  const params = new FormData();
+  params.append("rowCount", targetRows);
+  params.append("placeCount", targetPlaces);
+  params.append("config", JSON.stringify(finalConfig));
+
+  console.log("onfiguration to send:", {
+    dimensions: `${targetRows}x${targetPlaces}`,
+    config: finalConfig
+  });
 
   fetch(`https://shfe-diplom.neto-server.ru/hall/${currentHallConfig}`, {
     method: "POST",
     body: params
   })
-    .then(response => response.json())
-    .then((data) => {
-      console.log(data);
-      alert("Конфигурация зала сохранена!");
-      //fix
-      GetData();
-      //end fix
-    })
+  .then(response => response.json())
+  .then(data => {
+
+    GetData();
+  })
 }
 
 // SHOW PRICE
